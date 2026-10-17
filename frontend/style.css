@@ -1,0 +1,42 @@
+:root { --accent: #0b6e8a; --bg: #f3f6f8; --line: #d3dce1; --red: #b3261e; --text: #1c2a31; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.4; }
+.hidden { display: none !important; }
+
+h1 { font-size: 26px; margin: 24px 0 16px; }
+h2 { font-size: 18px; margin: 0 0 12px; }
+h3 { font-size: 15px; margin: 20px 0 6px; }
+small, .muted { color: #5a6b73; }
+
+header { background: white; border-bottom: 1px solid var(--line); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
+main { max-width: 960px; margin: 0 auto; padding: 0 16px 40px; }
+.columns { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+@media (max-width: 700px) { .columns { grid-template-columns: 1fr; } }
+
+.panel { background: white; border: 1px solid var(--line); border-radius: 6px; padding: 20px; margin-bottom: 16px; }
+.narrow { max-width: 380px; margin: 48px auto; }
+
+label { display: block; margin-bottom: 12px; font-size: 14px; font-weight: 600; }
+input, select { display: block; width: 100%; margin-top: 4px; padding: 8px; border: 1px solid var(--line); border-radius: 6px; font: inherit; font-weight: normal; }
+input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+fieldset { border: 1px solid var(--line); border-radius: 6px; margin: 0 0 12px; }
+fieldset label { display: inline-block; margin-right: 12px; font-weight: normal; }
+fieldset input { display: inline; width: auto; margin: 0 4px 0 0; }
+
+button { font: inherit; padding: 8px 14px; border: 1px solid var(--line); border-radius: 6px; background: white; cursor: pointer; }
+button.primary { background: var(--accent); border-color: var(--accent); color: white; }
+button.danger { color: var(--red); border-color: var(--red); }
+button.link { border: 0; background: none; color: var(--accent); padding: 0; text-decoration: underline; }
+.buttons { display: flex; gap: 8px; }
+
+.tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+.tabs button { flex: 1; }
+.tabs button.selected { background: var(--accent); border-color: var(--accent); color: white; }
+
+ul { list-style: none; margin: 0; padding: 0; }
+li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+li:first-child { border-top: 0; }
+
+#message { width: calc(100% - 32px); max-width: 928px; margin: 16px auto 0; padding: 10px 14px; background: #d9eef4; border-radius: 6px; }
+#message:empty { display: none; }
+#message.error { background: #fbe3e1; color: var(--red); }

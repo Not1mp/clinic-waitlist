@@ -105,8 +105,27 @@ async function handleApi(req, res, body) {
 
   if (method === 'POST' && pathName === '/api/waitlist') {
     const doctorId = body.doctorId == null ? null : Number(body.doctorId);
+    const days = typeof body.days === 'string' ? body.days.split(',') : [];
+    const startHour = Number(body.startHour);
+    const endHour = Number(body.endHour);
+    const endDate = String(body.endDate || '');
+    const dateMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(endDate);
+    const validDate = dateMatch && Number(dateMatch[1]) >= 1000 &&
+      new Date(Date.UTC(Number(dateMatch[1]), Number(dateMatch[2]) - 1, Number(dateMatch[3])))
+        .toISOString().slice(0, 10) === endDate;
+    const today = new Date();
+    const todayText = [today.getFullYear(), String(today.getMonth() + 1).padStart(2, '0'),
+      String(today.getDate()).padStart(2, '0')].join('-');
+    const allowedDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    if ((doctorId !== null && (!Number.isSafeInteger(doctorId) || doctorId < 1)) ||
+        days.length === 0 || days.some(function (day) { return !allowedDays.includes(day); }) ||
+        new Set(days).size !== days.length || !Number.isInteger(startHour) ||
+        !Number.isInteger(endHour) || startHour < 0 || endHour > 24 || startHour >= endHour ||
+        !['ASK_FIRST', 'AUTO_BOOK'].includes(body.mode) || !validDate || endDate < todayText) {
+      return sendJson(res, 400, { ok: false, message: 'Check your doctor, days, time range, response option, and end date.' });
+    }
     const waitlistId = await logic.joinWaitlist(
-      userId, doctorId, body.days, Number(body.startHour), Number(body.endHour), body.mode, body.endDate
+      userId, doctorId, days.join(','), startHour, endHour, body.mode, endDate
     );
     return sendJson(res, 201, { ok: true, waitlistId });
   }
@@ -123,8 +142,8 @@ async function handleApi(req, res, body) {
   sendJson(res, 404, { ok: false, message: 'API route not found.' });
 }
 
-// ----- serve the built React app -----
-const frontendDist = path.resolve(__dirname, '..', 'frontend', 'dist');
+// ----- serve the plain HTML, CSS, and JavaScript frontend -----
+const frontendFolder = path.resolve(__dirname, '..', 'frontend');
 const mimeTypes = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml',
@@ -134,10 +153,13 @@ const mimeTypes = {
 function serveFrontend(req, res) {
   let urlPath = decodeURIComponent(req.url.split('?')[0]);
   if (urlPath === '/' || urlPath === '/staff' || urlPath === '/patient') urlPath = '/index.html';
+  if (!['/index.html', '/style.css', '/app.js'].includes(urlPath)) {
+    return sendJson(res, 404, { ok: false, message: 'Frontend file not found.' });
+  }
 
-  // stop people from reading files outside the dist folder
-  const filePath = path.join(frontendDist, urlPath);
-  if (!filePath.startsWith(frontendDist + path.sep)) {
+  // stop people from reading files outside the frontend folder
+  const filePath = path.resolve(frontendFolder, '.' + urlPath);
+  if (filePath !== frontendFolder && !filePath.startsWith(frontendFolder + path.sep)) {
     return sendJson(res, 403, { ok: false, message: 'Invalid path.' });
   }
 
@@ -145,7 +167,7 @@ function serveFrontend(req, res) {
     if (err) {
       return sendJson(res, 404, {
         ok: false,
-        message: 'React app is not built yet. In the frontend folder run: npm install, then npm run build.'
+        message: 'File not found.'
       });
     }
     res.writeHead(200, { 'Content-Type': mimeTypes[path.extname(filePath)] || 'application/octet-stream' });

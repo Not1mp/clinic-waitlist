@@ -1,13 +1,114 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#087f83" />
-    <title>Clinic Waitlist</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clinic Waitlist</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <header id="topbar" class="hidden">
+    <strong>Clinic Care</strong>
+    <span><span id="who"></span> <button onclick="logout()">Sign out</button></span>
+  </header>
+
+  <p id="message"></p>
+
+  <!-- sign in and register -->
+  <section id="authPage" class="panel narrow hidden">
+    <h1 id="authTitle">Sign in</h1>
+    <div class="tabs">
+      <button id="patientTab" class="selected" onclick="setRole('PATIENT')">Patient</button>
+      <button id="staffTab" onclick="setRole('STAFF')">Staff</button>
+    </div>
+    <form id="authForm">
+      <label id="nameLabel" class="hidden">Full name <input id="nameInput" name="name" minlength="2"></label>
+      <label>Email <input name="email" type="email" required></label>
+      <label>Password <input name="password" type="password" minlength="8" required></label>
+      <button id="authButton" class="primary">Sign in</button>
+    </form>
+    <p id="switchText"><span id="switchLabel">New patient?</span> <button id="switchButton" class="link" onclick="toggleRegister()">Create an account</button></p>
+    <p id="staffNote" class="muted hidden">Staff accounts are created by the clinic administrator.</p>
+  </section>
+
+  <!-- staff -->
+  <main id="staffPage" class="hidden">
+    <h1>Clinic schedule</h1>
+    <div class="columns">
+      <section class="panel">
+        <h2>Add a doctor</h2>
+        <form id="doctorForm">
+          <label>Doctor name <input name="name" required></label>
+          <label>Specialty <input name="specialty" required></label>
+          <button class="primary">Add doctor</button>
+        </form>
+        <h3>Doctors</h3>
+        <div id="doctorList"></div>
+      </section>
+      <section class="panel">
+        <h2>Add an appointment slot</h2>
+        <form id="slotForm">
+          <label>Doctor <select id="doctorSelect" name="doctorId" required></select></label>
+          <label>Date <input name="date" type="date" required></label>
+          <label>Start time <input name="time" type="time" required></label>
+          <button class="primary">Add slot</button>
+        </form>
+      </section>
+    </div>
+    <section class="panel">
+      <h2>Open slots</h2>
+      <div id="staffSlots"></div>
+    </section>
+  </main>
+
+  <!-- patient -->
+  <main id="patientPage" class="hidden">
+    <h1 id="hello"></h1>
+    <section class="panel">
+      <h2>Available appointments</h2>
+      <div id="slotList"></div>
+    </section>
+    <div class="columns">
+      <section class="panel">
+        <h2>Join the waitlist</h2>
+        <form id="waitForm">
+          <label>Doctor <select id="waitDoctor" name="doctorId"></select></label>
+          <fieldset>
+            <legend>Days you can come</legend>
+            <label><input type="checkbox" name="day" value="Mon"> Mon</label>
+            <label><input type="checkbox" name="day" value="Tue"> Tue</label>
+            <label><input type="checkbox" name="day" value="Wed"> Wed</label>
+            <label><input type="checkbox" name="day" value="Thu"> Thu</label>
+            <label><input type="checkbox" name="day" value="Fri"> Fri</label>
+            <label><input type="checkbox" name="day" value="Sat"> Sat</label>
+            <label><input type="checkbox" name="day" value="Sun"> Sun</label>
+          </fieldset>
+          <label>Time of day
+            <select name="timeRange">
+              <option value="9-12">Morning, 9 AM to 12 PM</option>
+              <option value="12-17">Afternoon, 12 to 5 PM</option>
+              <option value="17-20">Evening, 5 to 8 PM</option>
+              <option value="0-24">Any time</option>
+            </select>
+          </label>
+          <fieldset>
+            <legend>If a slot opens</legend>
+            <label><input type="radio" name="mode" value="ASK_FIRST" checked> Ask me first</label>
+            <label><input type="radio" name="mode" value="AUTO_BOOK"> Book it automatically</label>
+          </fieldset>
+          <label>Keep this request until <input name="endDate" type="date" required></label>
+          <button class="primary">Join waitlist</button>
+        </form>
+      </section>
+      <div>
+        <section class="panel"><h2>My appointments</h2><div id="bookingList"></div></section>
+        <section class="panel"><h2>My offers</h2><div id="offerList"></div></section>
+        <section class="panel"><h2>My waitlist</h2><div id="waitList"></div></section>
+      </div>
+    </div>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
 </html>
