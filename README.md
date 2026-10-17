@@ -1,74 +1,98 @@
-<<<<<<< HEAD
-# Clinic Waitlist: React version
+# Clinic Waitlist
 
-This project has two parts:
+A clinic appointment portal with a React patient and staff interface, a Node.js API, and a MySQL database. Patients can book open appointments, manage their bookings, and join a preference-based waitlist. Staff can maintain the doctor list and publish appointment slots.
 
-- `App/` is the Node.js API and connects to MySQL.
-- `frontend/` is the React website.
+## Features
 
-The React version starts in `frontend/src/`.
+- Patient self-registration and sign-in; staff sign-in with administrator-created accounts.
+- Staff can add doctors and appointment slots, and remove doctors when they have no booked or offered slots.
+- Patients can book and cancel appointments, choose waitlist preferences by doctor, day, time, and end date, and leave a waitlist.
+- Waitlist requests can ask the patient to accept an opening or automatically book a matching opening.
+- Patient accounts receive time-limited offers for openings and can accept or decline them.
+- Role-protected API routes and HTTP-only session cookies.
 
-## One-time setup
+## Project layout
 
-1. Make sure the MySQL database already has the clinic tables used by the earlier project: `doctors`, `patients`, `slots`, `waitlist`, and `offers`.
-2. Keep the MySQL connection settings in `App/.env` as before. Do not share that file or put it in a public repository.
-3. Open a terminal in `frontend/` and install the React packages:
+- `App/` — Node.js API, MySQL access, appointment and waitlist logic, and staff account setup.
+- `frontend/` — React 19 interface built with Vite.
+
+## Requirements
+
+- Node.js and npm.
+- A running MySQL server and a database initialized with the clinic's existing tables: `doctors`, `patients`, `slots`, `waitlist`, and `offers`. The application creates the `auth_users` table at startup, but does not create the other tables.
+
+## Setup
+
+1. Configure the MySQL connection in `App/.env`:
+
+   ```dotenv
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_USER=your_mysql_user
+   DB_PASSWORD=your_mysql_password
+   DB_NAME=your_database_name
+   # Optional; defaults to 3000
+   PORT=3000
+   ```
+
+   Keep `.env` private. It is not included in the repository.
+
+2. Install backend dependencies:
 
    ```powershell
-   cd C:\Users\aloks\OneDrive\Desktop\clinic-waitlist\frontend
+   cd App
    npm install
    ```
 
-4. Open a terminal in `App/` and create the first staff login:
+3. Install frontend dependencies:
 
    ```powershell
-   cd C:\Users\aloks\OneDrive\Desktop\clinic-waitlist\App
+   cd ..\frontend
+   npm install
+   ```
+
+4. Create the initial staff account once:
+
+   ```powershell
+   cd ..\App
    npm run staff:create
    ```
 
-   Enter a staff email address and a password with at least 8 characters when prompted. Staff registration is not available from the public login screen.
+   Enter a valid email and a password of at least 8 characters. This setup command closes staff account creation after the first staff account exists.
 
-The Node server creates the `auth_users` table automatically the first time it starts. New patient accounts are created through the patient registration form and also create a row in the existing `patients` table. Patient records that were already in MySQL before login was added do not yet have accounts attached to them; for this learning version, use a newly registered patient account.
+Patient accounts can be created from the sign-in page. Registration creates a row in `patients` and links it to a login account. Existing patient records are not automatically linked to login accounts.
 
-## Run in development
+## Run locally
 
-Keep two terminals open.
-
-**Terminal 1 — backend:**
+Start the API in one terminal:
 
 ```powershell
-cd C:\Users\aloks\OneDrive\Desktop\clinic-waitlist\App
+cd App
 npm start
 ```
 
-**Terminal 2 — React website:**
+Start the Vite development server in a second terminal:
 
 ```powershell
-cd C:\Users\aloks\OneDrive\Desktop\clinic-waitlist\frontend
+cd frontend
 npm run dev
 ```
 
-Open the local address Vite prints, normally `http://localhost:5173`. Select Patient or Staff on the sign-in page. Patients can create their own account; staff use the account created in the one-time setup.
+Open the local URL printed by Vite (normally `http://localhost:5173`). Vite forwards `/api` requests to the API at `http://localhost:3000`.
 
-## Create a production build
+## Production build
 
-In the `frontend/` terminal, run:
+Build the React app:
 
 ```powershell
+cd frontend
 npm run build
 ```
 
-Then start the Node server with `npm start` from `App/`. It serves the generated React app and the API from port 3000.
+Then start the API from `App/` with `npm start`. The Node server serves the generated frontend from `frontend/dist` and the API on the configured port (3000 by default).
 
-## How sign-in works
+## Authentication and sessions
 
-- Passwords are stored as salted hashes, not readable passwords.
-- The server puts a random, HTTP-only session cookie in the browser after sign-in.
-- The API gets the patient ID from the signed-in session. It does not trust a patient ID sent by the page.
-- Staff-only actions (adding doctors and appointment slots) are rejected for patient accounts.
-- Patient-only actions (booking, cancelling, waitlist, and offers) are rejected for staff accounts.
+Passwords are stored as salted scrypt hashes. Successful sign-in sets an HTTP-only session cookie. Sessions are stored in server memory and expire after 12 hours; restarting the server signs users out. The API determines the patient identity from the session and restricts staff and patient actions by role.
 
-For this learning version, sign-in sessions are held in server memory and last up to 12 hours. Restarting the server signs everyone out; they can sign in again. Before a public deployment, configure HTTPS, review account recovery and rate limiting, and keep `.env` private.
-=======
-# clinic-waitlist
->>>>>>> 018f97044a36528c6cc98c6611503fd7a43a7208
+For a public deployment, serve the site over HTTPS and review session storage, account recovery, and login rate limiting. Set `NODE_ENV=production` when deploying over HTTPS so the session cookie receives the `Secure` flag.
