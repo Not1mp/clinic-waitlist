@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Clinic Waitlist: React version
 
 This project has two parts:
@@ -68,3 +69,6 @@ Then start the Node server with `npm start` from `App/`. It serves the generated
 - Patient-only actions (booking, cancelling, waitlist, and offers) are rejected for staff accounts.
 
 For this learning version, sign-in sessions are held in server memory and last up to 12 hours. Restarting the server signs everyone out; they can sign in again. Before a public deployment, configure HTTPS, review account recovery and rate limiting, and keep `.env` private.
+=======
+# clinic-waitlist
+>>>>>>> 018f97044a36528c6cc98c6611503fd7a43a7208
